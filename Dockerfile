@@ -19,6 +19,7 @@ RUN \
 COPY ./tsconfig.json /app/
 COPY ./pnpm-lock.yaml /app/
 COPY ./package.json /app/
+COPY ./env /app/
 
 # lazy install Chromium to avoid cache miss, only install production dependencies to minimize the image size
 RUN \
@@ -37,6 +38,7 @@ FROM debian:bookworm-slim AS dep-version-parser
 
 WORKDIR /ver
 COPY ./package.json /app/
+COPY ./env /app/
 RUN \
     set -ex && \
     grep -Po '(?<="puppeteer": ")[^\s"]*(?=")' /app/package.json | tee /ver/.puppeteer_version
