@@ -168,6 +168,7 @@ RUN \
     fi;
 
 COPY --from=docker-minifier /app /app
+COPY ./env /app/
 
 EXPOSE 1200
 ENTRYPOINT ["dumb-init", "--"]
