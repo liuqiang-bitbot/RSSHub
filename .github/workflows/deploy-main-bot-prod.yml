@@ -2,7 +2,7 @@ name: Deploy data-server  server prod
 
 on:
   push:
-    branches: ['main']
+    branches: ['master']
 
 env:
   KEY: prod  # 全局定义 KEY 环境变量
@@ -71,7 +71,7 @@ jobs:
 
       - name: Update eks
         run: |
-          
+
           sed -i "s|<IMAGE_PLACEHOLDER>|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" k8s.yaml
 
           # Apply the updated deployment configuration
