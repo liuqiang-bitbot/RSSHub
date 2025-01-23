@@ -16,7 +16,6 @@ test
 .codecov.yml
 .dockerignore
 .editorconfig
-.env
 .eslint*
 .gitignore
 .gitpod.yml
