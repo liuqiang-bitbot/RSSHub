@@ -38,7 +38,7 @@ FROM debian:bookworm-slim AS dep-version-parser
 
 WORKDIR /ver
 COPY ./package.json /app/
-COPY ./env /app/
+
 RUN \
     set -ex && \
     grep -Po '(?<="puppeteer": ")[^\s"]*(?=")' /app/package.json | tee /ver/.puppeteer_version
@@ -66,7 +66,7 @@ WORKDIR /app
 
 COPY . /app
 COPY --from=dep-builder /app /app
-
+COPY --from=dep-builder /app/.env /app/.env
 RUN \
     set -ex && \
     # cp /app/scripts/docker/minify-docker.js /minifier/ && \
