@@ -71,7 +71,7 @@ jobs:
 
       - name: Update eks
         run: |
-          kubectl -n prod set image deployment/rsshub rsshub=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl -n prod set image deployment/rsshub rsshub=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG-${{ env.TIMESTAMP }}
 
 
 
