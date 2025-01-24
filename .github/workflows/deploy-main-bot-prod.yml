@@ -76,7 +76,7 @@ jobs:
 
       - name: Update eks
         run: |
-          kubectl -n sit set image deployment/rsshub my-app-container=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl -n sit set image deployment/rsshub rsshub=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
 
