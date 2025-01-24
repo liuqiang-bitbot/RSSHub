@@ -15,7 +15,7 @@ env:
   KEY: sit  # 全局定义 KEY 环境变量
   ECR_REGISTRY: 147997140725.dkr.ecr.ap-southeast-1.amazonaws.com  # 全局定义 ECR_REGISTRY
   ECR_REPOSITORY: sit/bitbot/rsshub  # 全局定义 ECR_REPOSITORY
-  IMAGE_TAG: rsshub-${{ github.sha }}-${{github.run_number}}  # 全局定义 IMAGE_TAG
+  IMAGE_TAG: rsshub-${{ github.sha }}-${{ github.event.created_at }}  # 全局定义 IMAGE_TAG
 
 jobs:
   build-and-push:
