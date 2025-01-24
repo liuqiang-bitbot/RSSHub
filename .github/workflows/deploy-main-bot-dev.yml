@@ -1,4 +1,4 @@
-name: Deploy data-server  server sit
+name: Deploy rsshub  server sit
 
 on:
   push:
