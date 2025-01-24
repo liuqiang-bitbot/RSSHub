@@ -1,15 +1,15 @@
-name: Deploy data-server  server prod
+name: Deploy data-server server prod
 
 on:
   push:
     branches: ['master']
   workflow_dispatch:
-      inputs:
-        branch:
-          description: 'Branch to run the workflow on'
-          required: true
-          type: string
-          default: 'master'
+    inputs:
+      branch:
+        description: 'Branch to run the workflow on'
+        required: true
+        type: string
+        default: 'master'
 
 env:
   KEY: sit  # 全局定义 KEY 环境变量
@@ -33,9 +33,11 @@ jobs:
         run: |
           IMAGE_TAG="rsshub-${{ github.sha }}-${{ env.TIMESTAMP }}"
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+
   build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
+    needs: generate-tag  # 添加对 generate-tag 作业的依赖
     environment: production
 
     steps:
@@ -53,19 +55,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-
-
-
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ needs.generate-tag.outputs.image_tag }}
+          IMAGE_TAG: ${{ needs.generate-tag.outputs.image_tag }}  # 使用 generate-tag 作业的输出
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
   deploy-to-eks:
-    needs: [build-and-push]
+    needs: [generate-tag, build-and-push]  # 添加对 generate-tag 和 build-and-push 作业的依赖
     name: Deploy to EKS
     runs-on: ubuntu-latest
     environment: development
@@ -83,19 +82,16 @@ jobs:
 
       - name: Install kubectl
         run: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            sudo mv kubectl /usr/local/bin/kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
 
       - name: Configure AWS CLI for EKS
         run: |
-             aws eks --region ap-southeast-1 update-kubeconfig --name bitbot-${{ env.KEY }}-eks
+          aws eks --region ap-southeast-1 update-kubeconfig --name bitbot-${{ env.KEY }}-eks
 
       - name: Update eks
         env:
-          IMAGE_TAG: ${{ needs.generate-tag.outputs.image_tag }}
+          IMAGE_TAG: ${{ needs.generate-tag.outputs.image_tag }}  # 使用 generate-tag 作业的输出
         run: |
-          kubectl -n sit set image deployment/rsshub rsshub=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-
-
+          kubectl -n prod set image deployment/rsshub rsshub=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
