@@ -4,6 +4,12 @@ on:
   push:
     branches: ['master']
   workflow_dispatch:
+      inputs:
+        branch:
+          description: 'Branch to run the workflow on'
+          required: true
+          type: string
+          default: 'master'
 
 env:
   KEY: sit  # 全局定义 KEY 环境变量
