@@ -18,6 +18,22 @@ env:
   IMAGE_TAG: rsshub-${{ github.sha }}-${{ github.event.repository.updated_at}}  # 全局定义 IMAGE_TAG
 
 jobs:
+  generate-tag:
+    name: Generate Image Tag
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.generate-tag.outputs.image_tag }}
+
+    steps:
+      - name: Generate timestamp
+        id: timestamp
+        run: echo "TIMESTAMP=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Generate IMAGE_TAG
+        id: generate-tag
+        run: |
+          IMAGE_TAG="rsshub-${{ github.sha }}-${{ env.TIMESTAMP }}"
+          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
   build-and-push:
     name: Build and Push to ECR
     runs-on: ubuntu-latest
