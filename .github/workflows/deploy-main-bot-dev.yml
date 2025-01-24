@@ -1,4 +1,4 @@
-name: Deploy data-server  server prod
+name: Deploy data-server  server sit
 
 on:
   push:
